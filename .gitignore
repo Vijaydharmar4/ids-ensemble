@@ -9,6 +9,7 @@ __pycache__/
 data/
 *.csv
 #*.txt
+!Test_Input_Data/*.csv
 
 # Ignore model artifacts (large files)
 artifacts/
