@@ -8,7 +8,7 @@ __pycache__/
 # Ignore datasets
 data/
 *.csv
-*.txt
+#*.txt
 
 # Ignore model artifacts (large files)
 artifacts/
