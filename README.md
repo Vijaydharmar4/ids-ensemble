@@ -20,14 +20,14 @@ Supports both **binary classification** (Attack vs Benign) and **multi-class cla
 ## 📂 Project Structure
 
 ids-ensemble/
-├── src/ # Source code
-│ ├── app.py # Streamlit dashboard
-│ ├── load_cicids.py # Data loading & preprocessing
-│ └── train_ids_multiclass.py # Training script
-├── artifacts/ # Trained models (.joblib) [not pushed to GitHub]
-├── data/ # Small demo CSVs only (not full dataset)
-├── requirements.txt # Dependencies
-└── README.md
+├── src/                   # Source code
+│   ├── app.py             # Streamlit dashboard
+│   ├── load_cicids.py     # Data loading & preprocessing
+│   └── train_ids_multiclass.py   # Training script
+├── artifacts/             # Trained models (.joblib) [not pushed to GitHub]
+├── data/                  # Small demo CSVs (not full dataset)
+├── requirements.txt       # Dependencies
+└── README.md              # Documentation
 
 
 ---
@@ -36,11 +36,19 @@ ids-ensemble/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/<Vijaydharmar4>/ids-ensemble.git
+   git clone https://github.com/Vijaydharmar4/ids-ensemble.git
    cd ids-ensemble
 
 2. Install dependencies:
-    pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
 
-3. Run the dashboard:
-    streamlit run src/app.py
+3. ## 📥 Download Trained Models
+   ```bash
+   https://github.com/Vijaydharmar4/ids-ensemble/releases/tag/v1.0
+Place downloaded model inside ids-ensemble/artifacts/ before running app.
+
+4. Run the dashboard:
+   ```bash
+   streamlit run src/app.py
+
