@@ -28,14 +28,14 @@ Supports both **binary classification** (Attack vs Benign) and **multi-class cla
 
 3. ## 📥 Download Trained Models
    ```bash
-   https://github.com/Vijaydharmar4/ids-ensemble/releases/tag/v1.0
+   https://github.com/Vijaydharmar4/ids-ensemble/releases/tag/v1.1
 
 ## *IMPORTANT 
 Use Model: cicids_multiclass.joblib. 
-Create artifacts folder under root directory(ids-ensemble).
-Place downloaded model inside ids-ensemble/artifacts/ before running app.(
+Create artifacts folder under project directory(ids-ensemble).
+Place downloaded model inside ids-ensemble/artifacts/ before running app.
 
 4. Run the dashboard:
    ```bash
-   streamlit run src/app.py
+   streamlit run app.py
 
