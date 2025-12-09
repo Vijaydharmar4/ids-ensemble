@@ -1,0 +1,60 @@
+.attack-breakdown-container {
+  position: relative;
+}
+
+.attack-breakdown-container h3 {
+  color: #64b5f6;
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-wrapper {
+  background: rgba(100, 200, 255, 0.03);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(100, 200, 255, 0.1);
+  margin-bottom: 20px;
+}
+
+.attack-summary {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid rgba(100, 200, 255, 0.15);
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.05) 0%, rgba(100, 200, 255, 0.02) 100%);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.attack-summary p {
+  color: #c5d5e5;
+  font-size: 1rem;
+  margin: 0;
+  padding: 10px 18px;
+  background: rgba(100, 200, 255, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.attack-summary p:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 200, 255, 0.2);
+  background: rgba(100, 200, 255, 0.15);
+}
+
+.attack-summary strong {
+  color: #64b5f6;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+
+

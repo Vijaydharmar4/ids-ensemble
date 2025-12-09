@@ -58,7 +58,7 @@ def main():
     df = df[expected]
 
     df.to_csv(args.out, index=False)
-    print(f"✅ Wrote {len(df)} rows → {args.out}")
+    print(f"Wrote {len(df)} rows → {args.out}")
     print(f"(Columns aligned to model: {len(expected)})")
 
 if __name__ == "__main__":

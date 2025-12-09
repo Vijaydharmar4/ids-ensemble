@@ -44,7 +44,7 @@ def _drop_useless_cols(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns=list(set(drops)), errors="ignore")
 
 def _canon_label(s: str) -> str:
-    """Normalize dataset label strings into canonical attack types."""
+    
     t = str(s).strip().lower()
     if "benign" in t: return "benign"
     if "hulk" in t: return "dos hulk"
@@ -118,10 +118,7 @@ def load_cicids(
     sample_test: int = 0,
     verbose: bool = True,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Load CICIDS2017 and keep multi-class 'label_type' + binary 'label_binary'.
-    Returns (train_df, test_df).
-    """
+    
     if train_files or test_files:
         def norm(p: str) -> str:
             return os.path.join(folder, p) if not os.path.isabs(p) else p
@@ -134,7 +131,7 @@ def load_cicids(
         if sample_train > 0: train_df = _strat_sample(train_df, sample_train, seed)
         if sample_test  > 0: test_df  = _strat_sample(test_df,  sample_test,  seed)
         if verbose:
-            print("✅ Time split loaded")
+            print("Time split loaded")
             print("Train label_type counts:\n", train_df["label_type"].value_counts())
             print("Test  label_type counts:\n", test_df["label_type"].value_counts())
         return train_df.reset_index(drop=True), test_df.reset_index(drop=True)
@@ -156,7 +153,7 @@ def load_cicids(
     if sample_test  > 0: test_df  = _strat_sample(test_df,  sample_test,  seed)
 
     if verbose:
-        print(f"✅ Random split: {len(train_df):,} train, {len(test_df):,} test")
+        print(f"Random split: {len(train_df):,} train, {len(test_df):,} test")
         print("Train label_type counts:\n", train_df["label_type"].value_counts())
         print("Test  label_type counts:\n",  test_df["label_type"].value_counts())
     return train_df.reset_index(drop=True), test_df.reset_index(drop=True)
