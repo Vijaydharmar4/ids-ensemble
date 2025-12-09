@@ -15,23 +15,6 @@ Supports both **binary classification** (Attack vs Benign) and **multi-class cla
   - Attack-type breakdown and explanations
 - **Demo-ready CSVs** → Supports single-row and small test datasets.
 
----
-
-## 📂 Project Structure
-
-ids-ensemble/
-├── src/                   # Source code
-│   ├── app.py             # Streamlit dashboard
-│   ├── load_cicids.py     # Data loading & preprocessing
-│   └── train_ids_multiclass.py   # Training script
-├── artifacts/             # Trained models (.joblib) [pushed to GitHub Releases]
-├── data/                  # CICIDS2017 CSVs (not pushed to GitHub)
-├── requirements.txt       # Dependencies
-└── README.md              # Documentation
-
-
----
-
 ## ⚡ Quick Start
 
 1. Clone the repository:
@@ -45,11 +28,14 @@ ids-ensemble/
 
 3. ## 📥 Download Trained Models
    ```bash
-   https://github.com/Vijaydharmar4/ids-ensemble/releases/tag/v1.0
-Use Model "cicids_multiclass.joblib"
+   https://github.com/Vijaydharmar4/ids-ensemble/releases/tag/v1.1
+
+## *IMPORTANT 
+Use Model: cicids_multiclass.joblib. 
+Create artifacts folder under project directory(ids-ensemble).
 Place downloaded model inside ids-ensemble/artifacts/ before running app.
 
 4. Run the dashboard:
    ```bash
-   streamlit run src/app.py
+   streamlit run app.py
 
