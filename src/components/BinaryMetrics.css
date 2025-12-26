@@ -1,0 +1,131 @@
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
+  margin-bottom: 30px;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(100, 200, 255, 0.05) 100%);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #64b5f6, #4a9eff);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(100, 200, 255, 0.25);
+  border-color: rgba(100, 200, 255, 0.4);
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.15) 0%, rgba(100, 200, 255, 0.1) 100%);
+}
+
+.metric-card:hover::before {
+  transform: scaleX(1);
+}
+
+.metric-label {
+  color: #90a4ae;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #64b5f6 0%, #4a9eff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 4px 20px rgba(100, 181, 246, 0.3);
+  letter-spacing: -1px;
+}
+
+.confusion-matrix {
+  margin-top: 35px;
+  padding-top: 30px;
+  border-top: 2px solid rgba(100, 200, 255, 0.2);
+}
+
+.confusion-matrix h4 {
+  color: #64b5f6;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.matrix-table {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 10px;
+}
+
+.matrix-table td {
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(100, 200, 255, 0.05) 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(100, 200, 255, 0.2);
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.matrix-table td:hover {
+  transform: scale(1.1);
+  border-color: rgba(100, 200, 255, 0.4);
+  box-shadow: 0 8px 25px rgba(100, 200, 255, 0.2);
+}
+
+.matrix-table tr:first-child td:first-child {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+  border-color: rgba(76, 175, 80, 0.3);
+  color: #4caf50;
+}
+
+.matrix-table tr:first-child td:last-child {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 152, 0, 0.1) 100%);
+  border-color: rgba(255, 152, 0, 0.3);
+  color: #ff9800;
+}
+
+.matrix-table tr:last-child td:first-child {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 152, 0, 0.1) 100%);
+  border-color: rgba(255, 152, 0, 0.3);
+  color: #ff9800;
+}
+
+.matrix-table tr:last-child td:last-child {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 107, 107, 0.1) 100%);
+  border-color: rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+}
+
+
+

@@ -1,0 +1,10 @@
+
+duration,protocol_type,service,flag,src_bytes,dst_bytes,land,wrong_fragment,urgent,count,srv_count,serror_rate,srv_serror_rate,same_srv_rate,diff_srv_rate,dst_host_count,dst_host_srv_count,dst_host_same_srv_rate,dst_host_diff_srv_rate,labels
+0,tcp,http,SF,181,5450,0,0,0,9,9,0.00,0.00,1.00,0.00,255,26,0.10,0.05,normal
+0,udp,domain_u,SF,239,486,0,0,0,2,2,0.00,0.00,1.00,0.00,255,26,0.10,0.05,smurf
+0,icmp,ecr_i,SF,0,0,0,0,0,511,511,0.00,0.00,0.00,0.00,255,26,0.10,0.05,neptune
+0,tcp,smtp,SF,235,1337,0,0,0,6,6,0.00,0.00,1.00,0.00,255,26,0.10,0.05,nmap
+0,tcp,ftp_data,SF,12983,0,0,0,0,511,511,0.00,0.00,0.00,0.00,255,26,0.10,0.05,ipsweep
+0,udp,private,SF,105,146,0,0,0,9,9,0.00,0.00,1.00,0.00,255,26,0.10,0.05,guess_passwd
+0,icmp,eco_i,SF,0,0,0,0,0,0,0,0.00,0.00,0.00,0.00,255,26,0.10,0.05,buffer_overflow
+0,tcp,telnet,SF,256,0,0,0,0,511,511,0.00,0.00,1.00,0.00,255,26,0.10,0.05,rootkit

@@ -1,0 +1,70 @@
+.single-prediction-card {
+  text-align: center;
+  padding: 40px;
+}
+
+.prediction-result {
+  margin: 30px 0;
+}
+
+.prediction-badge {
+  display: inline-block;
+  padding: 15px 30px;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.prediction-badge.attack {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff9800 100%);
+  color: white;
+  animation: pulse-attack 2s infinite;
+}
+
+.prediction-badge.benign {
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  color: white;
+}
+
+@keyframes pulse-attack {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3); }
+  50% { transform: scale(1.05); box-shadow: 0 6px 30px rgba(255, 107, 107, 0.5); }
+}
+
+.probability-display {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(100, 200, 255, 0.1);
+  border-radius: 12px;
+  border: 2px solid rgba(100, 200, 255, 0.2);
+}
+
+.probability-value {
+  color: #64b5f6;
+  font-size: 2rem;
+}
+
+.caption {
+  color: #90a4ae;
+  font-size: 0.95rem;
+  margin: 10px 0;
+  font-family: 'Courier New', monospace;
+}
+
+code {
+  background: rgba(100, 200, 255, 0.15);
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #64b5f6;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  border: 1px solid rgba(100, 200, 255, 0.2);
+}
+
+
+
