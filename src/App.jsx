@@ -11,6 +11,8 @@ import { RealTimeStats } from './components/RealTimeStats';
 import { DashboardOverview } from './components/DashboardOverview';
 import { AttackDetails } from './components/AttackDetails';
 import { IntroPage } from './components/IntroPage';
+import { NetworkAnalysis } from './components/NetworkAnalysis';
+import { SettingsDashboard } from './components/SettingsDashboard';
 import './App.css';
 
 function App() {
@@ -53,16 +55,10 @@ function App() {
             ☰
           </button>
           <div className="navbar-logo">IDS</div>
-          <h2>Intrusion Detection System</h2>
+          <h2>Intrusion Detection System (Keep your system safe)</h2>
           <span className="navbar-status">
             <span className="status-dot"></span> LIVE
           </span>
-        </div>
-
-        <div className="navbar-right">
-          <div className="navbar-icon" title="Auto-Defense">⚡</div>
-          <div className="navbar-icon" title="Notifications">🔔</div>
-          <div className="navbar-icon" title="Settings">⚙</div>
         </div>
       </nav>
 
@@ -104,30 +100,21 @@ function App() {
             >
               <span className="sidebar-icon">⚠</span> Threats
             </button>
-            <button className="sidebar-link">
+            <button
+              className={`sidebar-link ${activeTab === 'network' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('network'); setShowLiveMonitor(false); }}
+            >
               <span className="sidebar-icon">🌐</span> Network
-            </button>
-            <button className="sidebar-link">
-              <span className="sidebar-icon">🚨</span> Alerts
             </button>
           </div>
 
-          <div className="sidebar-section">
-            <div className="sidebar-title">Analysis</div>
-            <button className="sidebar-link">
-              <span className="sidebar-icon">📈</span> Analytics
-            </button>
-            <button className="sidebar-link">
-              <span className="sidebar-icon">📜</span> History
-            </button>
-            <button className="sidebar-link">
-              <span className="sidebar-icon">📚</span> Logs
-            </button>
-          </div>
 
           <div className="sidebar-section">
             <div className="sidebar-title">System</div>
-            <button className="sidebar-link">
+            <button
+              className={`sidebar-link ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('settings'); setShowLiveMonitor(false); }}
+            >
               <span className="sidebar-icon">⚙</span> Settings
             </button>
           </div>
@@ -140,6 +127,10 @@ function App() {
 
           {showLiveMonitor ? (
             <LiveMonitor />
+          ) : activeTab === 'settings' ? (
+            <SettingsDashboard />
+          ) : activeTab === 'network' ? (
+            <NetworkAnalysis />
           ) : activeTab === 'dashboard' ? (
             <>
               <DashboardOverview />
@@ -188,7 +179,7 @@ function App() {
 
               <DatasetInfo />
 
-              <FileUploader onFileProcess={handleFileProcess} />
+              {activeTab === 'upload' && <FileUploader onFileProcess={handleFileProcess} />}
 
               {/* TABS */}
               {predictions && (

@@ -39,6 +39,9 @@ export function LiveMonitor() {
       if (data.stats) {
         setStats(data.stats);
       }
+      if (data.is_monitoring !== undefined) {
+        setMonitoring(data.is_monitoring);
+      }
     });
 
     socketRef.current.on('realtime_update', (data) => {

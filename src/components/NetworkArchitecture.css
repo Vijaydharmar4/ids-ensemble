@@ -1,0 +1,131 @@
+.architecture-container {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.arch-header h3 {
+    margin: 0;
+    color: #fff;
+}
+
+.arch-header p {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.arch-diagram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.arch-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.arch-zone.external {
+    border-color: #e74c3c;
+}
+
+.arch-zone.perimeter {
+    border-color: #f39c12;
+}
+
+.arch-zone.internal {
+    border-color: #00ff88;
+}
+
+.arch-node {
+    background: #1e2736;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    position: relative;
+}
+
+.arch-node .arch-icon {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.arch-node.internet {
+    color: #e74c3c;
+}
+
+.arch-node.firewall {
+    margin-bottom: 10px;
+    color: #f39c12;
+}
+
+.arch-node.ids {
+    border-color: #4a9eff;
+    color: #4a9eff;
+    box-shadow: 0 0 10px rgba(74, 158, 255, 0.2);
+}
+
+.arch-node.switch {
+    margin-bottom: 15px;
+    color: #00ff88;
+}
+
+.internal-nodes {
+    display: flex;
+    gap: 10px;
+}
+
+.arch-node.device {
+    font-size: 0.75rem;
+    padding: 8px;
+    min-width: 60px;
+}
+
+.flow-arrow {
+    color: #888;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.pulse-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    background: #00ff88;
+    border-radius: 50%;
+    animation: pulse-dot 1s infinite;
+}
+
+@keyframes pulse-dot {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

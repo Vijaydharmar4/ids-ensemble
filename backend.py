@@ -24,13 +24,29 @@ classes = None
 # Real-time monitoring state
 monitoring_active = False
 monitoring_thread = None
+
+# Stable simulated hosts
+KNOWN_HOSTS = [
+    {'ip': '192.168.1.1', 'type': 'router', 'label': 'Gateway'},
+    {'ip': '192.168.1.10', 'type': 'client', 'label': 'Admin PC'},
+    {'ip': '192.168.1.20', 'type': 'server', 'label': 'Web Server'},
+    {'ip': '192.168.1.55', 'type': 'iot', 'label': 'IoT Device'},
+    {'ip': '192.168.1.100', 'type': 'client', 'label': 'Workstation A'},
+    {'ip': '10.0.0.5', 'type': 'server', 'label': 'DB Server'}
+]
+
 stats = {
     'total_packets': 0,
     'threats_detected': 0,
     'critical_alerts': 0,
     'defense_actions': 0,
     'attack_types': {},
-    'recent_threats': []
+    'recent_threats': [],
+    'recent_packets': [],
+    'network_topology': {
+        'nodes': KNOWN_HOSTS,
+        'links': [] # Active links
+    }
 }
 
 def list_model_files():
@@ -246,18 +262,23 @@ def process_realtime_flow(df):
         return None
 
 def generate_wireshark_metadata():
-    """Simulate realistic packet metadata (Source, Dest, Protocol)"""
+    """Simulate realistic packet metadata with stable hosts"""
     protocols = ['TCP', 'UDP', 'HTTP', 'HTTPS', 'DNS', 'SSH', 'FTP', 'SMTP']
     
-    # Random realistic IP generation
-    if np.random.random() > 0.6:
-        # Internal traffic
-        src = f"192.168.1.{np.random.randint(2, 255)}"
+    # Pick stable hosts more often
+    if np.random.random() > 0.3:
+        src_node = np.random.choice(KNOWN_HOSTS)
+        src = src_node['ip']
     else:
-        # External traffic
+        # External/Random
         src = f"{np.random.randint(11, 200)}.{np.random.randint(0, 255)}.{np.random.randint(0, 255)}.{np.random.randint(0, 255)}"
-        
-    dst = f"10.0.0.{np.random.randint(2, 255)}" # Assume local server
+    
+    # Destination often internal
+    if np.random.random() > 0.3:
+        dst_node = np.random.choice(KNOWN_HOSTS)
+        dst = dst_node['ip']
+    else:
+        dst = f"10.0.0.{np.random.randint(2, 255)}"
     
     proto = np.random.choice(protocols, p=[0.4, 0.2, 0.2, 0.1, 0.05, 0.02, 0.02, 0.01])
     length = np.random.randint(64, 1514)
@@ -275,10 +296,15 @@ def realtime_monitoring_loop():
                 time.sleep(1)
                 continue
 
-            # 1. Generate Synthetic Traffic (Wireshark-like Header)
             src, dst, proto, length = generate_wireshark_metadata()
             
-            # 2. Generate Synthetic Features for Model (to get prediction)
+            # Update Topology Links (keep last 10 active links)
+            link = {'source': src, 'target': dst, 'proto': proto}
+            stats['network_topology']['links'].append(link)
+            if len(stats['network_topology']['links']) > 15:
+                stats['network_topology']['links'].pop(0)
+
+            # 2. Generate Synthetic Features for Model
             features = generate_synthetic_features(expected_cols)
             df = pd.DataFrame([features])
             
@@ -294,6 +320,11 @@ def realtime_monitoring_loop():
                 
                 stats['total_packets'] += 1
                 
+                # Add to recent packets history
+                stats['recent_packets'].append(result)
+                if len(stats['recent_packets']) > 50:
+                    stats['recent_packets'].pop(0)
+
                 # Check for attack
                 if result['is_attack']:
                     stats['threats_detected'] += 1
@@ -323,7 +354,7 @@ def realtime_monitoring_loop():
                     'latest_flow': result
                 })
                 
-            # Random packet interval (100ms - 800ms) for realistic flow speed
+            # Random packet interval
             time.sleep(np.random.uniform(0.1, 0.8))
             
         except Exception as e:
@@ -333,7 +364,11 @@ def realtime_monitoring_loop():
 @socketio.on('connect')
 def handle_connect():
     """Handle client connection"""
-    emit('connected', {'status': 'connected', 'stats': stats})
+    emit('connected', {
+        'status': 'connected', 
+        'stats': stats,
+        'is_monitoring': monitoring_active
+    })
 
 @socketio.on('start_monitoring')
 def handle_start_monitoring():
@@ -362,7 +397,12 @@ def handle_reset_stats():
         'critical_alerts': 0,
         'defense_actions': 0,
         'attack_types': {},
-        'recent_threats': []
+        'recent_threats': [],
+        'recent_packets': [],
+        'network_topology': {
+            'nodes': KNOWN_HOSTS,
+            'links': []
+        }
     }
     emit('stats_reset', {'status': 'reset', 'stats': stats})
 
@@ -384,4 +424,5 @@ if __name__ == "__main__":
         print("Warning: No model files found in artifacts directory")
     
     # Run with SocketIO
-    socketio.run(app, debug=True, port=5000, host='0.0.0.0')
+    print("Starting server on port 5000 (Debug=False for stability)...")
+    socketio.run(app, debug=False, port=5000, host='0.0.0.0', allow_unsafe_werkzeug=True)
