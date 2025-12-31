@@ -59,7 +59,7 @@ export function SettingsDashboard() {
               <div className="setting-title">Real-time Popup Alerts</div>
               <div className="setting-help">Show immediate browser notifications for critical threats.</div>
             </div>
-            <label className="switch">
+            <label className="toggle-switch">
               <input
                 type="checkbox"
                 checked={notifications}
@@ -74,7 +74,7 @@ export function SettingsDashboard() {
               <div className="setting-title">Email Reports</div>
               <div className="setting-help">Receive daily summary reports via email.</div>
             </div>
-            <label className="switch">
+            <label className="toggle-switch">
               <input type="checkbox" />
               <span className="slider round"></span>
             </label>
