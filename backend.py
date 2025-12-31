@@ -13,7 +13,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 ARTIFACTS_DIR = Path("artifacts")
 loaded_model = None
@@ -72,6 +72,13 @@ def load_model_by_name(name):
     loaded_model_name = name
     expected_cols = getattr(loaded_model, "feature_names_in_", None)
     classes = getattr(loaded_model, "classes_", None)
+    
+    # Log classes for debugging
+    if classes is not None:
+        print(f"Model loaded with classes: {classes}")
+    else:
+        print("Model loaded (no explicit classes attribute found)")
+        
     return {"model": name, "expected_cols": expected_cols.tolist() if expected_cols is not None else []}
 
 @app.route("/api/models", methods=["GET"])
@@ -190,14 +197,13 @@ def index():
         }
     })
 
-def generate_synthetic_flow():
-    """Generate a synthetic network flow for real-time monitoring"""
-    if loaded_model is None or expected_cols is None:
-        return None
-    
-    # Generate random feature values within reasonable ranges
+def generate_synthetic_features(df_template_cols):
+    """Generate synthetic flow features compatible with the model"""
     flow_data = {}
-    for col in expected_cols:
+    if df_template_cols is None:
+        return flow_data
+        
+    for col in df_template_cols:
         col_lower = str(col).lower()
         if 'duration' in col_lower or 'time' in col_lower:
             flow_data[col] = np.random.uniform(0, 1000)
@@ -209,9 +215,7 @@ def generate_synthetic_flow():
             flow_data[col] = np.random.randint(0, 10)
         else:
             flow_data[col] = np.random.uniform(0, 100)
-    
-    df = pd.DataFrame([flow_data])
-    return df
+    return flow_data
 
 def process_realtime_flow(df):
     """Process a single flow through the model"""
@@ -241,50 +245,89 @@ def process_realtime_flow(df):
         print(f"Error processing flow: {e}")
         return None
 
+def generate_wireshark_metadata():
+    """Simulate realistic packet metadata (Source, Dest, Protocol)"""
+    protocols = ['TCP', 'UDP', 'HTTP', 'HTTPS', 'DNS', 'SSH', 'FTP', 'SMTP']
+    
+    # Random realistic IP generation
+    if np.random.random() > 0.6:
+        # Internal traffic
+        src = f"192.168.1.{np.random.randint(2, 255)}"
+    else:
+        # External traffic
+        src = f"{np.random.randint(11, 200)}.{np.random.randint(0, 255)}.{np.random.randint(0, 255)}.{np.random.randint(0, 255)}"
+        
+    dst = f"10.0.0.{np.random.randint(2, 255)}" # Assume local server
+    
+    proto = np.random.choice(protocols, p=[0.4, 0.2, 0.2, 0.1, 0.05, 0.02, 0.02, 0.01])
+    length = np.random.randint(64, 1514)
+    
+    return src, dst, proto, length
+
 def realtime_monitoring_loop():
-    """Background thread for real-time monitoring"""
+    """Background thread for simulating real-time monitoring"""
     global monitoring_active, stats
+    print("Starting simulated packet monitoring...")
+    
     while monitoring_active:
         try:
-            # Generate and process a synthetic flow
-            flow_df = generate_synthetic_flow()
-            if flow_df is not None:
-                result = process_realtime_flow(flow_df)
-                if result:
-                    stats['total_packets'] += 1
-                    
-                    if result['is_attack']:
-                        stats['threats_detected'] += 1
-                        attack_type = result['prediction']
-                        stats['attack_types'][attack_type] = stats['attack_types'].get(attack_type, 0) + 1
-                        
-                        # Add to recent threats (keep last 50)
-                        threat_entry = {
-                            'id': stats['total_packets'],
-                            'type': attack_type,
-                            'severity': 'high' if result['probability'] > 0.8 else 'medium',
-                            'probability': result['probability'],
-                            'timestamp': result['timestamp']
-                        }
-                        stats['recent_threats'].append(threat_entry)
-                        if len(stats['recent_threats']) > 50:
-                            stats['recent_threats'].pop(0)
-                        
-                        # Critical alerts for high probability attacks
-                        if result['probability'] > 0.9:
-                            stats['critical_alerts'] += 1
-                            socketio.emit('critical_alert', threat_entry)
-                    
-                    # Emit real-time update
-                    socketio.emit('realtime_update', {
-                        'stats': stats.copy(),
-                        'latest_flow': result
-                    })
+            if loaded_model is None:
+                time.sleep(1)
+                continue
+
+            # 1. Generate Synthetic Traffic (Wireshark-like Header)
+            src, dst, proto, length = generate_wireshark_metadata()
             
-            # Random delay between 0.5-2 seconds
-            time.sleep(np.random.uniform(0.5, 2.0))
+            # 2. Generate Synthetic Features for Model (to get prediction)
+            features = generate_synthetic_features(expected_cols)
+            df = pd.DataFrame([features])
+            
+            # 3. Predict Attack/Benign
+            result = process_realtime_flow(df)
+            
+            if result:
+                # 4. Merge Real-looking Metadata
+                result['source_ip'] = src
+                result['dest_ip'] = dst
+                result['protocol'] = proto
+                result['length'] = length
+                
+                stats['total_packets'] += 1
+                
+                # Check for attack
+                if result['is_attack']:
+                    stats['threats_detected'] += 1
+                    attack_type = result['prediction']
+                    stats['attack_types'][attack_type] = stats['attack_types'].get(attack_type, 0) + 1
+                    
+                    threat_entry = {
+                        'id': stats['total_packets'],
+                        'type': attack_type,
+                        'severity': 'high' if result['probability'] > 0.8 else 'medium',
+                        'probability': result['probability'],
+                        'timestamp': result['timestamp'],
+                        'source': src
+                    }
+                    stats['recent_threats'].append(threat_entry)
+                    if len(stats['recent_threats']) > 50:
+                        stats['recent_threats'].pop(0)
+                    
+                    if result['probability'] > 0.9:
+                        stats['critical_alerts'] += 1
+                        socketio.emit('critical_alert', threat_entry)
+                
+                # Emit update
+                # print(f"Emitting packet: {src} -> {dst}") # Debug
+                socketio.emit('realtime_update', {
+                    'stats': stats.copy(),
+                    'latest_flow': result
+                })
+                
+            # Random packet interval (100ms - 800ms) for realistic flow speed
+            time.sleep(np.random.uniform(0.1, 0.8))
+            
         except Exception as e:
-            print(f"Monitoring error: {e}")
+            print(f"Simulation error: {e}")
             time.sleep(1)
 
 @socketio.on('connect')
@@ -324,12 +367,17 @@ def handle_reset_stats():
     emit('stats_reset', {'status': 'reset', 'stats': stats})
 
 if __name__ == "__main__":
-    # Auto-load the first available model
+    # Auto-load the first available model, prioritizing multiclass
     files = list_model_files()
     if files:
+        target_model = files[0]
+        # Prefer the multiclass model if available
+        if "cicids_multiclass.joblib" in files:
+            target_model = "cicids_multiclass.joblib"
+            
         try:
-            load_model_by_name(files[0])
-            print(f"Loaded model: {files[0]}")
+            load_model_by_name(target_model)
+            print(f"Loaded model: {target_model}")
         except Exception as e:
             print(f"Auto-load failed: {e}")
     else:

@@ -14,6 +14,7 @@ export function LiveMonitor() {
     recent_threats: []
   });
   const [latestFlow, setLatestFlow] = useState(null);
+  const [packetHistory, setPacketHistory] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const socketRef = useRef(null);
 
@@ -46,6 +47,7 @@ export function LiveMonitor() {
       }
       if (data.latest_flow) {
         setLatestFlow(data.latest_flow);
+        setPacketHistory(prev => [data.latest_flow, ...prev].slice(0, 15));
       }
     });
 
@@ -66,6 +68,14 @@ export function LiveMonitor() {
 
     socketRef.current.on('monitoring_stopped', () => {
       setMonitoring(false);
+    });
+
+    socketRef.current.on('stats_reset', (data) => {
+      if (data.stats) {
+        setStats(data.stats);
+      }
+      setPacketHistory([]); // Clear local history
+      setLatestFlow(null);
     });
 
     // Request notification permission
@@ -170,6 +180,24 @@ export function LiveMonitor() {
         <div className="latest-flow">
           <h3>Latest Flow Analysis</h3>
           <div className="flow-details">
+            {latestFlow.source_ip && (
+              <div className="flow-item">
+                <span className="flow-label">Source:</span>
+                <span className="flow-value small">{latestFlow.source_ip}</span>
+              </div>
+            )}
+            {latestFlow.dest_ip && (
+              <div className="flow-item">
+                <span className="flow-label">Dest:</span>
+                <span className="flow-value small">{latestFlow.dest_ip}</span>
+              </div>
+            )}
+            {latestFlow.protocol && (
+              <div className="flow-item">
+                <span className="flow-label">Protocol:</span>
+                <span className="flow-value">{latestFlow.protocol}</span>
+              </div>
+            )}
             <div className="flow-item">
               <span className="flow-label">Prediction:</span>
               <span className={`flow-value ${latestFlow.is_attack ? 'attack' : 'benign'}`}>
@@ -228,6 +256,40 @@ export function LiveMonitor() {
         </div>
       )}
 
+      {/* Live Packet Log (Wireshark-like) */}
+      {(monitoring || packetHistory.length > 0) && (
+        <div className="packet-log">
+          <h3>📡 Live Packet Capture</h3>
+          <div className="table-container">
+            <table className="packet-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Source</th>
+                  <th>Destination</th>
+                  <th>Protocol</th>
+                  <th>Length</th>
+                  <th>Info (Prediction)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* We maintain a local history of the last 15 packets for display */}
+                {packetHistory.map((pkt, idx) => (
+                  <tr key={idx} className={pkt.is_attack ? 'row-attack' : 'row-benign'}>
+                    <td>{formatTime(pkt.timestamp)}</td>
+                    <td>{pkt.source_ip || '-'}</td>
+                    <td>{pkt.dest_ip || '-'}</td>
+                    <td>{pkt.protocol || 'TCP'}</td>
+                    <td>{pkt.length || '0'}</td>
+                    <td>{pkt.prediction} ({pkt.is_attack ? 'THREAT' : 'Safe'})</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {stats.recent_threats && stats.recent_threats.length > 0 && (
         <div className="recent-threats">
           <h3>Recent Threats</h3>
@@ -249,6 +311,11 @@ export function LiveMonitor() {
     </div>
   );
 }
+
+
+
+
+
 
 
 

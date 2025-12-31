@@ -10,9 +10,11 @@ import { LiveMonitor } from './components/LiveMonitor';
 import { RealTimeStats } from './components/RealTimeStats';
 import { DashboardOverview } from './components/DashboardOverview';
 import { AttackDetails } from './components/AttackDetails';
+import { IntroPage } from './components/IntroPage';
 import './App.css';
 
 function App() {
+  const [showIntro, setShowIntro] = useState(true);
   const [predictions, setPredictions] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [realtimeStats, setRealtimeStats] = useState(null);
@@ -33,13 +35,17 @@ function App() {
     }
   };
 
+  if (showIntro) {
+    return <IntroPage onEnter={() => setShowIntro(false)} />;
+  }
+
   return (
     <div className="app-container">
 
       {/* NAVBAR */}
       <nav className="navbar">
         <div className="navbar-left">
-          <button 
+          <button
             className="mobile-menu-toggle"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             aria-label="Toggle menu"
@@ -64,7 +70,7 @@ function App() {
 
         {/* SIDEBAR */}
         <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-          <button 
+          <button
             className="sidebar-close"
             onClick={() => setSidebarOpen(false)}
             aria-label="Close menu"
@@ -74,25 +80,25 @@ function App() {
 
           <div className="sidebar-section">
             <div className="sidebar-title">Menu</div>
-            <button 
+            <button
               className={`sidebar-link ${activeTab === 'dashboard' && !showLiveMonitor ? 'active' : ''}`}
               onClick={() => { setActiveTab('dashboard'); setShowLiveMonitor(false); }}
             >
               <span className="sidebar-icon">📊</span> Dashboard
             </button>
-            <button 
+            <button
               className={`sidebar-link ${activeTab === 'upload' ? 'active' : ''}`}
               onClick={() => { setActiveTab('upload'); setShowLiveMonitor(false); }}
             >
               <span className="sidebar-icon">📤</span> Upload & Analyze
             </button>
-            <button 
+            <button
               className={`sidebar-link ${showLiveMonitor ? 'active' : ''}`}
               onClick={() => { setShowLiveMonitor(true); setActiveTab('live'); }}
             >
               <span className="sidebar-icon">👁</span> Live Monitor
             </button>
-            <button 
+            <button
               className={`sidebar-link ${activeTab === 'threats' ? 'active' : ''}`}
               onClick={() => { setActiveTab('threats'); setShowLiveMonitor(false); }}
             >
