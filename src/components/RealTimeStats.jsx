@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 
 export function RealTimeStats({ onStatsUpdate }) {
+  // eslint-disable-next-line no-unused-vars
   const [stats, setStats] = useState({
     total_packets: 0,
     threats_detected: 0,

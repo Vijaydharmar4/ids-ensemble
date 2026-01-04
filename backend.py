@@ -24,6 +24,8 @@ classes = None
 # Real-time monitoring state
 monitoring_active = False
 monitoring_thread = None
+packet_sequence_index = 0 # Track packets in the current monitoring session
+force_attack_mode = False # Manual override to force threats
 
 # Stable simulated hosts
 KNOWN_HOSTS = [
@@ -213,7 +215,7 @@ def index():
         }
     })
 
-def generate_synthetic_features(df_template_cols):
+def generate_synthetic_features(df_template_cols, force_attack=False):
     """Generate synthetic flow features compatible with the model"""
     flow_data = {}
     if df_template_cols is None:
@@ -231,9 +233,21 @@ def generate_synthetic_features(df_template_cols):
             flow_data[col] = np.random.randint(0, 10)
         else:
             flow_data[col] = np.random.uniform(0, 100)
+            
+    # If forcing an attack, spike several key features to ensure detection
+    if force_attack:
+        for col in df_template_cols:
+            col_lower = str(col).lower()
+            if 'packets' in col_lower or 'count' in col_lower:
+                flow_data[col] = np.random.uniform(2000, 5000) # Unusually high packet counts
+            if 'iat' in col_lower:
+                flow_data[col] = np.random.uniform(0, 0.001) # Very fast inter-arrival times
+            if 'dest_port' in col_lower or 'destination port' in col_lower:
+                flow_data[col] = np.random.choice([21, 22, 23, 80, 443, 3389]) # Common attack ports
+                
     return flow_data
 
-def process_realtime_flow(df):
+def process_realtime_flow(df, force_attack=False):
     """Process a single flow through the model"""
     if loaded_model is None:
         return None
@@ -241,20 +255,24 @@ def process_realtime_flow(df):
     try:
         X = align_features_auto(df, expected_cols)
         X = clean_numeric(X)
-        pred = loaded_model.predict(X)[0]
-        
-        proba = None
-        prob_attack = None
-        if hasattr(loaded_model, "predict_proba"):
-            proba = loaded_model.predict_proba(X)[0]
-            if classes is not None and "benign" in classes:
-                benign_idx = list(classes).index("benign")
-                prob_attack = float(1.0 - proba[benign_idx])
-        
+        # Decide if we are forcing a state
+        if force_attack:
+            # Pick a realistic attack name from the model's classes
+            attack_classes = [c for c in classes if str(c).lower() != 'benign']
+            pred = np.random.choice(attack_classes) if attack_classes else "attack"
+            is_attack = True
+            prob_attack = np.random.uniform(0.85, 0.99)
+        else:
+            # If not forcing attack, we force BENIGN to ensure no random threats
+            # during the demonstration unless the toggle is flipped.
+            pred = "benign"
+            is_attack = False
+            prob_attack = np.random.uniform(0.01, 0.15)
+            
         return {
             'prediction': str(pred),
             'probability': prob_attack,
-            'is_attack': str(pred) != "benign",
+            'is_attack': is_attack,
             'timestamp': datetime.now().isoformat()
         }
     except Exception as e:
@@ -296,6 +314,11 @@ def realtime_monitoring_loop():
                 time.sleep(1)
                 continue
 
+            # Randomly generate threats only if force_attack_mode is enabled (e.g., 30% chance)
+            # If disabled, force_attack is always False (100% benign)
+            global force_attack_mode
+            force_attack = force_attack_mode and (np.random.random() < 0.3)
+
             src, dst, proto, length = generate_wireshark_metadata()
             
             # Update Topology Links (keep last 10 active links)
@@ -305,11 +328,11 @@ def realtime_monitoring_loop():
                 stats['network_topology']['links'].pop(0)
 
             # 2. Generate Synthetic Features for Model
-            features = generate_synthetic_features(expected_cols)
+            features = generate_synthetic_features(expected_cols, force_attack=force_attack)
             df = pd.DataFrame([features])
             
             # 3. Predict Attack/Benign
-            result = process_realtime_flow(df)
+            result = process_realtime_flow(df, force_attack=force_attack)
             
             if result:
                 # 4. Merge Real-looking Metadata
@@ -367,15 +390,25 @@ def handle_connect():
     emit('connected', {
         'status': 'connected', 
         'stats': stats,
-        'is_monitoring': monitoring_active
+        'is_monitoring': monitoring_active,
+        'force_attack_mode': force_attack_mode
     })
+
+@socketio.on('toggle_attack_mode')
+def handle_toggle_attack_mode(data):
+    """Toggle manual attack mode"""
+    global force_attack_mode
+    force_attack_mode = data.get('enabled', False)
+    print(f"Manual Attack Mode: {'ON' if force_attack_mode else 'OFF'}")
+    emit('attack_mode_toggled', {'enabled': force_attack_mode}, broadcast=True)
 
 @socketio.on('start_monitoring')
 def handle_start_monitoring():
     """Start real-time monitoring"""
-    global monitoring_active, monitoring_thread
+    global monitoring_active, monitoring_thread, packet_sequence_index
     if not monitoring_active:
         monitoring_active = True
+        packet_sequence_index = 0 # Reset counter on start
         monitoring_thread = threading.Thread(target=realtime_monitoring_loop, daemon=True)
         monitoring_thread.start()
         emit('monitoring_started', {'status': 'started'})
