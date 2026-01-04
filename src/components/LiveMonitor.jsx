@@ -50,7 +50,8 @@ export function LiveMonitor() {
       }
       if (data.latest_flow) {
         setLatestFlow(data.latest_flow);
-        setPacketHistory(prev => [data.latest_flow, ...prev].slice(0, 15));
+        // Show all packets (up to 1000 for stability)
+        setPacketHistory(prev => [data.latest_flow, ...prev].slice(0, 1000));
       }
     });
 
@@ -276,7 +277,7 @@ export function LiveMonitor() {
                 </tr>
               </thead>
               <tbody>
-                {/* We maintain a local history of the last 15 packets for display */}
+                {/* List all captured packets (up to 1000) */}
                 {packetHistory.map((pkt, idx) => (
                   <tr key={idx} className={pkt.is_attack ? 'row-attack' : 'row-benign'}>
                     <td>{formatTime(pkt.timestamp)}</td>

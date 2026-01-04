@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { getAttackInfo, getSeverityColor } from '../utils/attackInfo';
+import { getAttackInfo } from '../utils/attackInfo';
 import './AttackDetails.css';
 
 export function AttackDetails({ attackCounts }) {
-  const [selectedAttack, setSelectedAttack] = useState(null);
   const [expandedAttacks, setExpandedAttacks] = useState(new Set());
 
   if (!attackCounts || (Array.isArray(attackCounts) && attackCounts.length === 0)) {
@@ -20,8 +19,8 @@ export function AttackDetails({ attackCounts }) {
   }
 
   // Convert to array if object
-  const attacksArray = Array.isArray(attackCounts) 
-    ? attackCounts 
+  const attacksArray = Array.isArray(attackCounts)
+    ? attackCounts
     : Object.entries(attackCounts).map(([name, count]) => ({ name, count }));
 
   // Sort by count (descending)
@@ -63,8 +62,8 @@ export function AttackDetails({ attackCounts }) {
           const percentage = ((attack.count / totalAttacks) * 100).toFixed(1);
 
           return (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`attack-card ${info.severity.toLowerCase()}`}
               style={{ borderLeftColor: info.color }}
             >
@@ -135,9 +134,9 @@ export function AttackDetails({ attackCounts }) {
 
                   <div className="attack-visual">
                     <div className="visual-bar">
-                      <div 
-                        className="visual-bar-fill" 
-                        style={{ 
+                      <div
+                        className="visual-bar-fill"
+                        style={{
                           width: `${percentage}%`,
                           backgroundColor: info.color
                         }}

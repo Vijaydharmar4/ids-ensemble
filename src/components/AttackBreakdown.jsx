@@ -1,11 +1,11 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import './AttackBreakdown.css';
 
 export function AttackBreakdown({ attackCounts }) {
   // Handle both object and array formats
   let chartData = [];
-  
+
   if (!attackCounts) {
     chartData = [];
   } else if (Array.isArray(attackCounts)) {
@@ -38,21 +38,21 @@ export function AttackBreakdown({ attackCounts }) {
       <div className="chart-wrapper">
         <ResponsiveContainer width="100%" height={380}>
           <BarChart data={chartData} margin={{ top: 25, right: 30, left: 20, bottom: 70 }}>
-            <XAxis 
-              dataKey="name" 
+            <XAxis
+              dataKey="name"
               angle={-45}
               textAnchor="end"
               height={120}
               tick={{ fill: '#90a4ae', fontSize: 11, fontWeight: 600 }}
               interval={0}
             />
-            <YAxis 
-              tick={{ fill: '#90a4ae', fontSize: 12 }} 
+            <YAxis
+              tick={{ fill: '#90a4ae', fontSize: 12 }}
               label={{ value: 'Count', angle: -90, position: 'insideLeft', fill: '#90a4ae' }}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'rgba(30, 42, 58, 0.98)', 
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(30, 42, 58, 0.98)',
                 border: '2px solid rgba(100, 200, 255, 0.4)',
                 borderRadius: '12px',
                 color: '#e0e0e0',

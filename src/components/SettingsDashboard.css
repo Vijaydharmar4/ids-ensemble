@@ -226,3 +226,23 @@ input:checked+.slider:before {
     color: #000;
     box-shadow: 0 0 20px rgba(74, 158, 255, 0.4);
 }
+
+.settings-card.highlight {
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    box-shadow: 0 0 25px rgba(231, 76, 60, 0.1);
+}
+
+.settings-card.highlight h3 {
+    color: #e74c3c;
+    border-bottom: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.toggle-switch.danger input:checked+.slider {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+}
+
+.toggle-switch.danger input:checked+.slider:before {
+    background-color: #e74c3c;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}

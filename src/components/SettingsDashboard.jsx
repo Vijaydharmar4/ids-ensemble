@@ -1,10 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import io from 'socket.io-client';
 import './SettingsDashboard.css';
 
 export function SettingsDashboard() {
   const [notifications, setNotifications] = useState(true);
   const [sensitivity, setSensitivity] = useState(80);
   const [retention, setRetention] = useState(30);
+  const [forceAttackMode, setForceAttackMode] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    socketRef.current = io('http://localhost:5000', {
+      transports: ['websocket', 'polling']
+    });
+
+    socketRef.current.on('connect', () => {
+      setConnected(true);
+    });
+
+    socketRef.current.on('connected', (data) => {
+      if (data.force_attack_mode !== undefined) {
+        setForceAttackMode(data.force_attack_mode);
+      }
+    });
+
+    socketRef.current.on('attack_mode_toggled', (data) => {
+      setForceAttackMode(data.enabled);
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  const toggleForceAttackMode = () => {
+    if (socketRef.current && connected) {
+      socketRef.current.emit('toggle_attack_mode', { enabled: !forceAttackMode });
+    }
+  };
 
   return (
     <div className="settings-container">
@@ -79,6 +115,34 @@ export function SettingsDashboard() {
               <span className="slider round"></span>
             </label>
           </div>
+        </div>
+
+        {/* Demonstration Settings */}
+        <div className="settings-card highlight">
+          <h3>🧪 Demonstration Settings</h3>
+          <p className="section-desc" style={{ color: '#90a4ae', fontSize: '0.9rem', marginBottom: '15px' }}>
+            Special tools for testing and verifying the system's detection capabilities.
+          </p>
+
+          <div className="setting-row">
+            <div>
+              <div className="setting-title" style={{ fontWeight: '600', color: '#eceff1' }}>Enable Forced Threats</div>
+              <div className="setting-help" style={{ color: '#b0bec5', fontSize: '0.85rem', marginTop: '4px', maxWidth: '300px' }}>
+                When enabled, the system will randomly inject threat packets (30% probability)
+                into the live monitoring stream. Use this to demonstrate detection alerts and
+                system responses during a presentation.
+              </div>
+            </div>
+            <label className="toggle-switch danger">
+              <input
+                type="checkbox"
+                checked={forceAttackMode}
+                onChange={toggleForceAttackMode}
+              />
+              <span className="slider round"></span>
+            </label>
+          </div>
+          {!connected && <div className="connection-error" style={{ color: '#ff4757', marginTop: '10px', fontSize: '0.85rem' }}>⚠️ Disconnected from monitoring backend</div>}
         </div>
 
         {/* System Info */}
